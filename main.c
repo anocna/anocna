@@ -429,7 +429,7 @@ void desarrollo(Bingo *bingo, Datos *datos){
     for(j=0;j<i;j++){
         printf("  [%2.d]",bolillas[j]);
     }
-    printf(".-");
+    printf(".-"\n\n);
 
     printf(
          "\n            =========================================            "
@@ -513,38 +513,6 @@ void verificarLinea (Carton *carton, int *puntos, int *linea,int c){
             }
         }
     }
-
-
-    /*
-    int v, n, i, j,luno=-1,ldos=-1,ltres=-1;
-
-    for(n=0;n<c;n++){
-
-        for ( i =0; i<RENGLON; i++){
-            //iniciar vector en cero
-            v = 0;
-
-            for ( j= 0; j<COLUMNA; j++ ){
-
-                //SUMA = SUMA +NUMERO
-                v += carton[n].casilla[i][j];
-            }
-
-            if(v==0 && n!=luno && n!=ldos && n=!ltres){
-
-                *linea=*linea+1;
-                carton[n].lin=carton[n].lin+1;
-
-                if(*linea==1){
-                    *puntos+=20;
-                    printf("--> %s ha sacado linea con en carton %d, por ser la primer linea gana 20 Puntos!\n",carton[n].id,carton[n].num);
-                }
-                else{printf("--> %s ha sacado linea con en carton %d vamos %d lineas y %d lineas en este carton\n",carton[n].id,carton[n].num,*linea,carton[n].lin);}
-
-            }
-        }
-    }*/
-
 }
 
 void verificarColumna (Carton *carton, int *puntos, int *col, int c){
@@ -570,7 +538,7 @@ void verificarColumna (Carton *carton, int *puntos, int *col, int c){
                     if(*col==1){
                         *puntos+=10;
                         printf("--> %s ha sacado columna con en carton %d, por ser la primer columna gana 10 Puntos!\n",carton[n].id,carton[n].num);
-                    }else{printf("--> %s ha sacado columna con en carton %d",carton[n].id,carton[n].num);}
+                    }else{printf("--> %s ha sacado columna con en carton %d\n",carton[n].id,carton[n].num);}
                 }
 
             }
@@ -589,9 +557,9 @@ void marcarBola (Carton *carton, int num, int c){
 
             for (j = 0; j<COLUMNA; j++){
 
-                if ( carton->casilla[i][j]==num){ //Lo encontre
+                if ( carton[n].casilla[i][j]==num){ //Lo encontre
 
-                    carton->casilla[i][j] = 0;
+                    carton[n].casilla[i][j] = 0;
 
                     printf("\n %s ha marcado el numero %d en el carton %d \n", carton[n].id,num,carton[n].num);
                 }
