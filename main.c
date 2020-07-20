@@ -18,8 +18,8 @@ typedef struct {
     int     casilla[RENGLON][COLUMNA];
     char    id[20];                     // a quien pertenece el carton
     int     num;                        //numero de carton
-    int     lin;                        //numero de lineas
-    int     col;                        //numero de columnas
+    int     lin[3];                        //numero de lineas
+    int     col[5];                        //numero de columnas
     } Carton;
 
 typedef struct {
@@ -32,8 +32,6 @@ typedef struct {
     int     modoJuego;          // generar juego completo o sacar bolillas de a una
     int     numBingos;          // numero bingos cantados
 } Bingo;
-
-typedef struct { int *numeros; } Partida; // Guarda los numeros que aparecen durante la partida
 
 
 void cargarDatos        (Datos *datos); // PRE: Una estructura con formato Datos. POST: Carga los ingresados por el usuario.
@@ -62,7 +60,6 @@ int  main (void) {  // FUNCION MAIN()
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
 
     Bingo bingo;
-    Partida partida;
     Datos datos;
 
     cargarDatos(&datos);
@@ -95,8 +92,6 @@ void cargarDatos(Datos *datos){
 
 
 void iniciarPartida (Bingo *bingo){
-
-    int i;
 
     // Solicita al usuario el numero de cartones a jugar
     do {
@@ -271,7 +266,7 @@ int busquedaSecuencial(Carton *carton, int num){
 void ordenamiento(Carton *carton){
 
     int x=(RENGLON*COLUMNA);
-    int i=0, vec[x], r, c, aux, j;
+    int i=0, vec[x], r, c;
 
     for(r=0;r<RENGLON;r++){
         for(c=0;c<COLUMNA;c++){
@@ -342,13 +337,19 @@ void llenarConCeros(Bingo *bingo){
                 bingo->cartonPc[n].casilla[i][j]=0;
                 //bingo->espejoPc[n].casilla[i][j]=0;
                 //bingo->espejoUser[n].casilla[i][j]=0;
+
+                bingo->cartonUser[n].col[j]=0; //lleno con ceros el contador de columnas de cada carton
+                bingo->cartonPc[n].col[j]=0;
             }
+
+            bingo->cartonPc[n].lin[i]=0;//lleno con ceros el contador de lineas de cada carton
+            bingo->cartonUser[n].lin[i]=0;
         }
         //bingo->espejoPc[n].num=n+1; // le asigno un nuemero identificador al carton espejo
         //bingo->espejoUser[n].num=n+1;
 
-        bingo->cartonPc->lin=0;
-        bingo->cartonUser->col=0;
+
+
     }
 }
 
@@ -359,13 +360,13 @@ void desarrollo(Bingo *bingo, Datos *datos){
 
 
     for(n=0;n<90;n++){
-            bolillas[n]=0;
+        bolillas[n]=0;
     }
 
     datos->puntosPc=0;   // iniciamos el puntaje a 0.
     datos->puntosUser=0;
 
-    printf("\n   Comencemos a sacar bolillas...\n");
+    printf("\n Comencemos a sacar bolillas...\n");
     system("pause");
 
     while(nBingo!=1){
@@ -383,6 +384,7 @@ void desarrollo(Bingo *bingo, Datos *datos){
 
 
         printf("\n>>> Ha salido la bola numero: %d \n", bola);
+
         bolillas[i]=bola;
         i++;
 
@@ -399,6 +401,7 @@ void desarrollo(Bingo *bingo, Datos *datos){
         verificarBingo(bingo->cartonPc,&datos->puntosPc,&nBingo,bingo->cantidad);
 
 
+
         for(n=0;n < (bingo->cantidad);n++){
             printf("\n\n|>      %s - Carton  Numero %d     <",bingo->cartonPc[n].id,bingo->cartonPc[n].num);
             mostrarCarton(&bingo->cartonPc[n]);
@@ -407,8 +410,8 @@ void desarrollo(Bingo *bingo, Datos *datos){
             printf("Cantidad de Lineas %d\n",nlinea);
             printf("Cantidad de Columnas %d \n",ncolunma);
             printf("Cantidad de Bingo %d\n\n",nBingo);
-
         }
+
 
         if(bingo->modoJuego==2){
             system("pause");
@@ -422,11 +425,18 @@ void desarrollo(Bingo *bingo, Datos *datos){
     printf("Total de puntos de %s %s --> %d\n",datos->nombre,datos->apellido,datos->puntosUser);
     printf("Total de puntos de PC --> %d\n",datos->puntosPc);
 
-    printf("\n\n Salieron %d bolillas, estas fueron:", i);
+    printf("\n\n Salieron %d bolillas, estas fueron:\n", i);
     for(j=0;j<i;j++){
-        printf("  [%d]",bolillas[j]);
+        printf("  [%2.d]",bolillas[j]);
     }
     printf(".-");
+
+    printf(
+         "\n            =========================================            "
+         "\n========================|    G A M E    |========================"
+         "\n========================|    O V E R    |========================"
+         "\n            =========================================            ");
+
 
 }
 
@@ -468,8 +478,7 @@ void verificarBingo(Carton *carton,int *puntos, int *bin, int c){
         }
         if(suma==0){
 
-            printf("\n\n========    G A M E    ========\n========    O V E R    ========\n\n");
-            printf("------>  %s ha completado el BINGO con en carton numero %d",carton[n].id,carton[n].num);
+            printf("------> %s ha completado el BINGO con en carton numero %d \n\n",carton[n].id,carton[n].num);
             *puntos+=70;
             *bin=1;
         }
@@ -479,7 +488,35 @@ void verificarBingo(Carton *carton,int *puntos, int *bin, int c){
 
 void verificarLinea (Carton *carton, int *puntos, int *linea,int c){
 
-    int v, n, i, j;
+
+    int i, j, n, v, x;
+
+    for(n=0;n<c;n++){
+        for(i=0;i<RENGLON;i++){
+            v=0;
+            for(j=0;j<COLUMNA;j++){
+                v+=carton[n].casilla[i][j];
+            }
+            for(x=0;x<RENGLON;x++){
+                if(v==0 && carton[n].lin[i]==0){
+
+                    *linea+=1;
+                    carton[n].lin[i]+=1;
+
+                    if(*linea==1){
+                        *puntos+=20;
+                        printf("--> %s ha sacado linea con en carton %d, por ser la primer linea gana 20 Puntos!\n",carton[n].id,carton[n].num);
+                    }
+                    else{printf("--> %s ha sacado linea con en carton %d vamos %d lineas y %d lineas en este carton\n",carton[n].id,carton[n].num,*linea,carton[n].lin[i]);}
+
+                }
+            }
+        }
+    }
+
+
+    /*
+    int v, n, i, j,luno=-1,ldos=-1,ltres=-1;
 
     for(n=0;n<c;n++){
 
@@ -493,25 +530,26 @@ void verificarLinea (Carton *carton, int *puntos, int *linea,int c){
                 v += carton[n].casilla[i][j];
             }
 
-            if(v==0 && carton[n].lin<3){
+            if(v==0 && n!=luno && n!=ldos && n=!ltres){
 
                 *linea=*linea+1;
-                carton[n].lin++;
+                carton[n].lin=carton[n].lin+1;
 
                 if(*linea==1){
                     *puntos+=20;
                     printf("--> %s ha sacado linea con en carton %d, por ser la primer linea gana 20 Puntos!\n",carton[n].id,carton[n].num);
                 }
+                else{printf("--> %s ha sacado linea con en carton %d vamos %d lineas y %d lineas en este carton\n",carton[n].id,carton[n].num,*linea,carton[n].lin);}
 
             }
         }
-    }
+    }*/
 
 }
 
 void verificarColumna (Carton *carton, int *puntos, int *col, int c){
 
-    int v, n, i, j;
+    int v, n, i, j, x;
 
     for(n=0;n<c;n++){
 
@@ -520,17 +558,19 @@ void verificarColumna (Carton *carton, int *puntos, int *col, int c){
             v=0;
             for ( j= 0; j<RENGLON; j++ ){
 
-                //SUMA = SUMA +NUMERO
-                v += carton[n].casilla[j][i];
+                v += carton[n].casilla[j][i];//SUMA = SUMA +NUMERO
             }
-            if(v==0 && carton[n].col<5){
 
-                *col=*col+1;
-                carton[n].col++;
+            for(x=0;x<COLUMNA;x++){
 
-                if(*col==1){
-                    *puntos+=10;
-                    printf("--> %s ha sacado columna con en carton %d, por ser la primer columna gana 10 Puntos!\n",carton[n].id,carton[n].num);
+                if(v==0 && carton[n].col[i]==0){
+                    *col+=1;
+                    carton[n].col[i]+=1;
+
+                    if(*col==1){
+                        *puntos+=10;
+                        printf("--> %s ha sacado columna con en carton %d, por ser la primer columna gana 10 Puntos!\n",carton[n].id,carton[n].num);
+                    }else{printf("--> %s ha sacado columna con en carton %d",carton[n].id,carton[n].num);}
                 }
 
             }
