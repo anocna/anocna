@@ -507,7 +507,7 @@ void verificarLinea (Carton *carton, int *puntos, int *linea,int c){
                         *puntos+=20;
                         printf("--> %s ha sacado linea con en carton %d, por ser la primer linea gana 20 Puntos!\n",carton[n].id,carton[n].num);
                     }
-                    else{printf("--> %s ha sacado linea con en carton %d vamos %d lineas y %d lineas en este carton\n",carton[n].id,carton[n].num,*linea,carton[n].lin[i]);}
+                    else{printf("--> %s ha sacado linea con en carton %d\n",carton[n].id,carton[n].num);}
 
                 }
             }
