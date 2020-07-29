@@ -302,7 +302,7 @@ void desarrollo(Bingo *bingo){
 
 
         printf("Cantidad de Lineas %d\n",nlinea);
-        printf("Cantidad de Bingo %d\n\n",nBingo);
+        printf("Cantidad de Bingo %d\n\n\n\n\n\n\n\n\n\n\n",nBingo);
 
 
         system("pause");
@@ -348,19 +348,19 @@ void verificarBingo(Carton *carton,Bingo *bingo, int *bin){
                 suma = suma + carton[n].casilla[i][j];
             }
         }
-        if(suma==0 && carton->bin<2){
+        if(suma==0 && carton[n].bin==0){
 
             if(*bin==0){
                 strcpy(bingo->premioBingo1,carton[n].nombre);
                 printf("*******    %s ha cantado el primer BINGO, gano $ %d       *******\n\n",carton[n].nombre,PBINGOUNO);
                 *bin+=1;
-                carton->bin=+1;
+                carton[n].bin=+1;
                 printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
                 mostrarCarton(&bingo->cartonUser[n]);
             }else{strcpy(bingo->premioBingo2,carton[n].nombre);
                 printf("*******    %s ha cantado el segundo BINGO, gano $ %d      *******\n\n",carton[n].nombre,PBINGODOS);
                 *bin+=1;
-                carton->bin=+1;
+                carton[n].bin=+1;
                 printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
                 mostrarCarton(&bingo->cartonUser[n]);}
         }
