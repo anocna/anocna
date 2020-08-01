@@ -15,7 +15,7 @@ typedef struct {
     int     casilla[RENGLON][COLUMNA];
     char    nombre[20];                     // a quien pertenece el carton
     int     lin[2];                        //numero de lineas
-    int     bin;                        //numero de columnas
+    int     bin;                        //numero de bingo
     } Carton;
 
 typedef struct {
@@ -36,10 +36,10 @@ void mostrarCarton      (Carton *carton);
 void ordenamientoBurbuja(int v[], int tam);
 void llenarConCeros     (Carton *carton);
 void desarrollo         (Bingo *bingo);
-void verificarLinea     (Carton *carton, Bingo *bingo, int *linea);
-void verificarBingo     (Carton *carton, Bingo *bingo, int *bin);
+void verificarLinea     (Bingo *bingo, int *linea);
+void verificarBingo     (Bingo *bingo, int *bin);
 void multiplicarPuntos  (int bolillas, int *puntos);
-void marcarBola         (Carton *carton, int num,int c);
+void marcarBola         (Bingo *bingo, int num);
 
 
 
@@ -71,7 +71,7 @@ int  main (void) {  // FUNCION MAIN()
 
 void cargarDatos(Bingo *bingo){
 
-    int i, j, n, nuevoNumero, resultadoBusqueda;
+    int i, j, nuevoNumero, resultadoBusqueda;
     bingo->cantidad=0;
 
     int seguir=1;
@@ -100,7 +100,7 @@ void cargarDatos(Bingo *bingo){
                     do{
                         nuevoNumero = 1 +rand()%90;
 
-                        resultadoBusqueda = busquedaSecuencial(&bingo->cartonUser[bingo->cantidad].casilla, nuevoNumero); //nos da la posicion ---> -1
+                        resultadoBusqueda = busquedaSecuencial(&bingo->cartonUser[bingo->cantidad], nuevoNumero); //nos da la posicion ---> -1
 
                     }while(resultadoBusqueda!=-1);
 
@@ -109,7 +109,7 @@ void cargarDatos(Bingo *bingo){
             }
 
 
-            printf("\n\n se cargo el aleatorio");
+           // printf("\n\n se cargo el aleatorio");
 
 
     }else{
@@ -157,6 +157,8 @@ void cargarDatos(Bingo *bingo){
         } while (seguir != 1 && seguir != 2);
 
     }while(seguir==1);
+
+    printf("\n\n la cantidad de cartones en juego es de %d\n",bingo->cantidad);
 
 
 }
@@ -263,19 +265,16 @@ void llenarConCeros(Carton *carton){
 
 void desarrollo(Bingo *bingo){
 
-    int nBingo=0, nlinea=0, i=0, j, n, bola=0, bolillas[200],resultadoBusqueda, cant;
-
-    cant=0;
+    int nBingo=0, nlinea=0, i=0, j, n, bola=0, bolillas[200],resultadoBusqueda;
 
     for(n=0;n<90;n++){  //llevo bolillero a cero
         bolillas[n]=0;
     }
 
-
     printf("\n\n Comencemos a sacar bolillas...\n");
     system("pause");
 
-    while(nBingo<3){
+    while(nBingo<2){
 
         do{
             resultadoBusqueda=-1;
@@ -289,20 +288,20 @@ void desarrollo(Bingo *bingo){
         }while(resultadoBusqueda!=-1);
 
 
-        printf("\n> > > > > > > Ha salido la bola numero: %d \n", bola);
+        printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n> > > > > > > Ha salido la bola numero: %d \n\n", bola);
 
         bolillas[i]=bola;
         i++;
 
-        marcarBola(bingo->cartonUser,bola,bingo->cantidad);
+        marcarBola(bingo,bola);
 
-        verificarLinea(bingo->cartonUser,bingo, &nlinea);
+        verificarLinea(bingo, &nlinea);
 
-        verificarBingo(bingo->cartonUser,bingo,&nBingo);
+        verificarBingo(bingo,&nBingo);
 
 
         printf("Cantidad de Lineas %d\n",nlinea);
-        printf("Cantidad de Bingo %d\n\n\n\n\n\n\n\n\n\n\n",nBingo);
+        printf("Cantidad de Bingo %d\n",nBingo);
 
 
         system("pause");
@@ -334,41 +333,49 @@ void desarrollo(Bingo *bingo){
 
 
 
-void verificarBingo(Carton *carton,Bingo *bingo, int *bin){
+void verificarBingo(Bingo *bingo, int *bin){
 
-    int suma=0, n;
+    int suma, n;
 
     for(n=0;n<bingo->cantidad;n++){
+
+    suma=0;
 
         for ( int i =0; i<RENGLON; i++){
 
             for ( int j= 0; j<COLUMNA; j++ ){
 
                 //SUMA = SUMA +NUMERO
-                suma = suma + carton[n].casilla[i][j];
+                suma = suma + bingo->cartonUser[n].casilla[i][j];
             }
         }
-        if(suma==0 && carton[n].bin==0){
+        if(suma==0 && bingo->cartonUser[n].bin==0){
 
-            if(*bin==0){
-                strcpy(bingo->premioBingo1,carton[n].nombre);
-                printf("*******    %s ha cantado el primer BINGO, gano $ %d       *******\n\n",carton[n].nombre,PBINGOUNO);
+            if(*bin==1){
+                strcpy(bingo->premioBingo2,bingo->cartonUser[n].nombre);
+                printf("\n\n ***************************************************************\n"
+                       "*******    %s ha cantado el segundo BINGO, gano $ %d      *******\n"
+                       " ***************************************************************\n\n",bingo->cartonUser[n].nombre,PBINGODOS);
                 *bin+=1;
-                carton[n].bin=+1;
+                bingo->cartonUser[n].bin+=1;
                 printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
                 mostrarCarton(&bingo->cartonUser[n]);
-            }else{strcpy(bingo->premioBingo2,carton[n].nombre);
-                printf("*******    %s ha cantado el segundo BINGO, gano $ %d      *******\n\n",carton[n].nombre,PBINGODOS);
+
+            }else if(*bin==0){
+                strcpy(bingo->premioBingo1,bingo->cartonUser[n].nombre);
+                printf("\n\n ***************************************************************\n"
+                       "*******    %s ha cantado el primer BINGO, gano $ %d       *******\n"
+                       " ***************************************************************\n\n",bingo->cartonUser[n].nombre,PBINGOUNO);
                 *bin+=1;
-                carton[n].bin=+1;
+                bingo->cartonUser[n].bin+=1;
                 printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
-                mostrarCarton(&bingo->cartonUser[n]);}
+                mostrarCarton(&bingo->cartonUser[n]);
+            }
         }
     }
-
 }
 
-void verificarLinea (Carton *carton, Bingo *bingo, int *linea){
+void verificarLinea (Bingo *bingo, int *linea){
 
 
     int i, j, n, v;
@@ -377,47 +384,51 @@ void verificarLinea (Carton *carton, Bingo *bingo, int *linea){
         for(i=0;i<RENGLON;i++){
             v=0;
             for(j=0;j<COLUMNA;j++){
-                v+=carton[n].casilla[i][j];
+                v+=bingo->cartonUser[n].casilla[i][j];
             }
 
-                if(v==0 && carton[n].lin[i]==0){
+            if(v==0 && bingo->cartonUser[n].lin[i]==0){
 
+
+
+                if(*linea==0){
+
+                    strcpy(bingo->premioLinea1,bingo->cartonUser[n].nombre);
+                    printf("\n\n*******    %s ah cantado la primer linea, gana $ %d !!   ********\n",bingo->cartonUser[n].nombre,PLINEAUNO);
+                    printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
+                    mostrarCarton(&bingo->cartonUser[n]);
                     *linea+=1;
-                    carton[n].lin[i]+=1;
+                    bingo->cartonUser[n].lin[i]+=1;
 
-                    if(*linea<3){
-                        if(*linea==1){
-                        strcpy(bingo->premioLinea1,carton[n].nombre);
-                        printf("\n*******    %s ah cantado la primer linea, gana $ %d !!   ********\n",carton[n].nombre,PLINEAUNO);
-                        printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
-                        mostrarCarton(&bingo->cartonUser[n]);
-                        }else{strcpy(bingo->premioLinea2,carton[n].nombre);
-                        printf("\n*******    %s ah cantado la segunda linea, gana $ %d !!   *******\n",carton[n].nombre,PLINEADOS);
-                        printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
-                        mostrarCarton(&bingo->cartonUser[n]);}
-                    }
+                }else if (*linea==1){
+                    strcpy(bingo->premioLinea2,bingo->cartonUser[n].nombre);
+                    printf("\n\n*******    %s ah cantado la segunda linea, gana $ %d !!   *******\n",bingo->cartonUser[n].nombre,PLINEADOS);
+                    printf("\n\n|>  Carton de %s <|",bingo->cartonUser[n].nombre);
+                    mostrarCarton(&bingo->cartonUser[n]);
+                    *linea+=1;
+                    bingo->cartonUser[n].lin[i]+=1;
                 }
-
+            }
         }
     }
 }
 
 
-void marcarBola (Carton *carton, int num, int c){
+void marcarBola (Bingo *bingo, int num){
 
     int i, j, n;
 
-    for(n=0;n<c;n++){
+    for(n=0;n<bingo->cantidad;n++){
 
         for(i=0;i<RENGLON;i++){
 
             for (j = 0; j<COLUMNA; j++){
 
-                if ( carton[n].casilla[i][j]==num){ //Lo encontre
+                if ( bingo->cartonUser[n].casilla[i][j]==num){ //Lo encontre
 
-                    carton[n].casilla[i][j] = 0;
+                    bingo->cartonUser[n].casilla[i][j] = 0;
 
-                    printf("\n *******   %s ha marcado el %d en su carton \n", carton[n].nombre,num);
+                    printf("\n\n ~~~~~~~~~  %s ha marcado el %d en su carton \n\n", bingo->cartonUser[n].nombre,num);
                 }
             }
         }
